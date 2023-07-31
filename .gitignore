@@ -1,3 +1,4 @@
 *.exe
+*.ppk
 .env
 serviceAccountKey.json
