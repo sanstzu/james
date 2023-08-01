@@ -20,6 +20,8 @@ func main() {
 	bot.Handle("/convert", handlers.Convert)
 	bot.Handle("/initialize", handlers.Initialize)
 	bot.Handle("/getpack", handlers.GetPack)
+	bot.Handle("/connect", handlers.Connect)
+	bot.Handle("/disconnect", handlers.Disconnect)
 	bot.Handle("/help", handlers.Help)
 
 	bot.Start()

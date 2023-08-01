@@ -12,10 +12,10 @@ func GetPack(c tele.Context) error {
 		return err
 	}
 	if response == nil {
-		return c.Reply("This chat have not initialize any sticker set yet. Please use /initialize first.")
+		return c.Reply("This chat have not initialize any sticker set yet. Please use /initialize or /convert first.")
 	}
 
 	stickerName := response["sticker_id"].(string)
 
-	return c.Reply("Sticker pack link: https://t.me/addstickers/" + stickerName)
+	return c.Reply("Sticker Pack: https://t.me/addstickers/" + stickerName)
 }

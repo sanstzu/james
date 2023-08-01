@@ -21,6 +21,7 @@ func Initialize(c tele.Context) error {
 	args := make(map[string]string)
 
 	args["name"] = rawArgs[1]
+	stickerName := args["name"] + "_by_" + c.Bot().Me.Username
 	args["emojis"] = rawArgs[2]
 	args["title"] = strings.Join(rawArgs[3:], " ")
 
@@ -29,12 +30,20 @@ func Initialize(c tele.Context) error {
 		return c.Reply("Invalid emoji(s). The number of emojis must be between 1 and 20, and must be all emojis.")
 	}
 
-	stickerSetDetails, err := models.GetChat(c.Chat().ID)
+	chatDetails, err := models.GetChat(c.Chat().ID)
+	if err != nil {
+		return err
+	}
+	if chatDetails != nil {
+		return c.Reply("This chat already has a sticker set. Please use /convert instead, or /getpack to get the sticker set.")
+	}
+
+	stickerSetDetails, err := models.GetSticker(stickerName)
 	if err != nil {
 		return err
 	}
 	if stickerSetDetails != nil {
-		return c.Reply("This chat already has a sticker set. Please use /convert instead, or /getpack to get the sticker set.")
+		return c.Reply("This sticker name already exists. Please use another sticker name.")
 	}
 
 	var photo *tele.Photo
@@ -86,8 +95,6 @@ func Initialize(c tele.Context) error {
 		Emoji_list: emojiList,
 	}
 
-	stickerName := args["name"] + "_by_" + c.Bot().Me.Username
-
 	stickerSet := &fnc.CreateNewStickerSetParams{
 		UserId:        c.Message().Sender.ID,
 		Name:          stickerName,
@@ -100,6 +107,9 @@ func Initialize(c tele.Context) error {
 	addChat := &models.AddChatParams{
 		ChatId:    c.Message().Chat.ID,
 		StickerId: stickerName,
+	}
+	addSticker := &models.AddStickerParams{
+		StickerId: stickerName,
 		OwnerId:   c.Message().Sender.ID,
 	}
 
@@ -109,6 +119,11 @@ func Initialize(c tele.Context) error {
 	}
 
 	err = models.AddChat(*addChat)
+	if err != nil {
+		return err
+	}
+
+	err = models.AddSticker(*addSticker)
 	if err != nil {
 		return err
 	}
