@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"image"
-	"image/jpeg"
 	"image/png"
 
 	"io/ioutil"
@@ -12,6 +11,7 @@ import (
 
 	"github.com/chai2010/webp"
 	"github.com/nfnt/resize"
+	tele "gopkg.in/telebot.v3"
 )
 
 func Get(url string, resp *map[string]interface{}) error {
@@ -73,7 +73,7 @@ func ConvertToWebp(img image.Image) ([]byte, error) {
 }
 
 func ResizeImage(raw []byte) ([]byte, image.Image, error) {
-	img, err := jpeg.Decode(bytes.NewReader(raw))
+	img, _, err := image.Decode(bytes.NewReader(raw))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -89,17 +89,20 @@ func ResizeImage(raw []byte) ([]byte, image.Image, error) {
 	} else {
 		isWidthAuto = true
 	}
+
 	var res image.Image
 	if isWidthAuto {
 		res = resize.Resize(0, 512, img, resize.MitchellNetravali)
 	} else {
 		res = resize.Resize(512, 0, img, resize.MitchellNetravali)
 	}
+
 	rawRes := new(bytes.Buffer)
 	err = png.Encode(rawRes, res)
 	if err != nil {
 		return nil, nil, err
 	}
+
 	return rawRes.Bytes(), res, nil
 }
 
@@ -115,4 +118,14 @@ func IsAllEmoji(s []string) bool {
 
 	// Return true until a solution is found to detect emojis in a string
 	return true
+}
+
+func ExtractFileId(msg *tele.Message) string {
+	if msg.Photo != nil {
+		return msg.Photo.FileID
+	} else if msg.Sticker != nil {
+		return msg.Sticker.FileID
+	} else {
+		return ""
+	}
 }

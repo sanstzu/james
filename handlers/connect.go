@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"strings"
 
 	"github.com/sanstzu/james/models"
@@ -29,7 +28,6 @@ func Connect(c tele.Context) error {
 		return c.Reply("This chat already has a sticker set.")
 	}
 
-	log.Printf("%s", stickerName)
 	stickerSetDetails, err := models.GetSticker(stickerName)
 	if err != nil {
 		return err
@@ -39,7 +37,6 @@ func Connect(c tele.Context) error {
 		return c.Reply("Sticker with the that particular name is not found.")
 	}
 
-	log.Printf("%v %v", stickerSetDetails["owner_id"], c.Sender().ID)
 	if stickerSetDetails["owner_id"] != c.Sender().ID {
 		return c.Reply("You are not the owner of this sticker set (the person who initializes it).")
 	}

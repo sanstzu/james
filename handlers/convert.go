@@ -21,11 +21,10 @@ func Convert(c tele.Context) error {
 
 	args["emojis"] = rawArgs[1]
 
-	emojiList := strings.Split(args["emojis"], "")
+	emojiList := []string{args["emojis"]}
 	log.Printf("emojiList: %v", emojiList)
 	if !utils.IsAllEmoji(emojiList) || len(emojiList) > 20 {
-		log.Printf("IsAllEmoji: %v", utils.IsAllEmoji(emojiList))
-		return c.Reply("Invalid emoji(s). The number of emojis must be between 1 and 20, and must be all emojis.")
+		return c.Reply("Invalid emoji")
 	}
 
 	chatDetails, err := models.GetChat(c.Chat().ID)
@@ -42,16 +41,13 @@ func Convert(c tele.Context) error {
 		return err
 	}
 
-	var photo *tele.Photo
-	if c.Message().Photo != nil {
-		photo = c.Message().Photo
-	} else if c.Message().ReplyTo != nil && c.Message().ReplyTo.Photo != nil {
-		photo = c.Message().ReplyTo.Photo
-	} else {
-		return c.Reply("No photo found in message/replied message.")
+	var photoId string = ""
+	if photoId = utils.ExtractFileId(c.Message()); photoId == "" && c.Message().ReplyTo != nil {
+		photoId = utils.ExtractFileId(c.Message().ReplyTo)
 	}
-
-	photoId := photo.FileID
+	if photoId == "" {
+		return c.Reply("Please reply or send to a photo/sticker to convert it.")
+	}
 
 	var resp map[string]interface{}
 	err = utils.Get("https://api.telegram.org/bot"+consts.ENV("TELEGRAM_APITOKEN")+"/getFile?file_id="+photoId, &resp)
