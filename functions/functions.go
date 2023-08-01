@@ -89,7 +89,8 @@ func AddStickerToSet(sticker *AddStickerToSetParams) error {
 	json.NewDecoder(resp.Body).Decode(&resMap)
 
 	if err != nil || resMap["ok"] != true {
-		return resMap["description"].(error)
+		newError := errors.New(resMap["description"].(string))
+		return newError
 	}
 	return nil
 }
