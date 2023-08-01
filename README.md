@@ -35,6 +35,9 @@ Once it is done installing the dependencies, you can build the bot by running:
 - `/initialize` - Initialize the sticker pack in the chat (one sticker pack per chat only)
 - `/add` - Add a sticker to the sticker pack
 - `/getpack` - Get the sticker pack link for the current chat
+- `/connect` - Connect an existing sticker pack (made by through this bot) to the chat
+- `/disconnect` - Disconnect the sticker pack from the chat
+- `/help` - Show the help message
 
 To check the parameters of the sticker pack, you can just type the command without any parameters.
 
