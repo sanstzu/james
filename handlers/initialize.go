@@ -96,8 +96,8 @@ func Initialize(c tele.Context) error {
 
 	stickerSet := &fnc.CreateNewStickerSetParams{
 		UserId:        c.Message().Sender.ID,
-		Name:          stickerName + ":: made with @" + c.Bot().Me.Username,
-		Title:         args["title"],
+		Name:          stickerName,
+		Title:         args["title"] + "[made with" + c.Bot().Me.Username + "]",
 		Stickers:      []fnc.InputSticker{*startingSticker},
 		StickerFormat: "static",
 		StickerType:   "regular",
