@@ -18,7 +18,7 @@ func InitializeBot() {
 		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
 		OnError: func(err error, c tele.Context) {
 			log.Println(err)
-			//c.Reply("An internal error has occured. Please try again later.")
+			c.Reply("An internal error has occured. Please try again later.")
 		},
 	}
 
