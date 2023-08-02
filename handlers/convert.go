@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"bytes"
+	"image"
 	"log"
 	"strings"
 
@@ -42,8 +43,9 @@ func Convert(c tele.Context) error {
 	}
 
 	var photoId string = ""
-	if photoId = utils.ExtractFileId(c.Message()); photoId == "" && c.Message().ReplyTo != nil {
-		photoId = utils.ExtractFileId(c.Message().ReplyTo)
+	var photoSource string = ""
+	if photoId, photoSource = utils.ExtractFileId(c.Message()); photoId == "" && c.Message().ReplyTo != nil {
+		photoId, photoSource = utils.ExtractFileId(c.Message().ReplyTo)
 	}
 	if photoId == "" {
 		return c.Reply("Please reply or send to a photo/sticker to convert it.")
@@ -64,7 +66,14 @@ func Convert(c tele.Context) error {
 		return err
 	}
 
-	_, resizedImg, err := utils.ResizeImage(rawFile)
+	var resizeImage func(raw []byte) ([]byte, image.Image, error)
+
+	if photoSource == "sticker" {
+		resizeImage = utils.ResizeImage
+	} else if photoSource == "photo" {
+		resizeImage = utils.ResizeImageJpeg
+	}
+	_, resizedImg, err := resizeImage(rawFile)
 	if err != nil {
 		return err
 	}

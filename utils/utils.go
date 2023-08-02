@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"image"
+	"image/jpeg"
 	"image/png"
 
 	"io/ioutil"
@@ -72,6 +73,40 @@ func ConvertToWebp(img image.Image) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
+func ResizeImageJpeg(raw []byte) ([]byte, image.Image, error) {
+	img, err := jpeg.Decode(bytes.NewReader(raw))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	b := img.Bounds()
+
+	var isWidthAuto bool
+	width := b.Max.X
+	height := b.Max.Y
+
+	if width > height {
+		isWidthAuto = false
+	} else {
+		isWidthAuto = true
+	}
+
+	var res image.Image
+	if isWidthAuto {
+		res = resize.Resize(0, 512, img, resize.MitchellNetravali)
+	} else {
+		res = resize.Resize(512, 0, img, resize.MitchellNetravali)
+	}
+
+	rawRes := new(bytes.Buffer)
+	err = png.Encode(rawRes, res)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return rawRes.Bytes(), res, nil
+}
+
 func ResizeImage(raw []byte) ([]byte, image.Image, error) {
 	img, _, err := image.Decode(bytes.NewReader(raw))
 	if err != nil {
@@ -120,12 +155,12 @@ func IsAllEmoji(s []string) bool {
 	return true
 }
 
-func ExtractFileId(msg *tele.Message) string {
+func ExtractFileId(msg *tele.Message) (string, string) {
 	if msg.Photo != nil {
-		return msg.Photo.FileID
+		return msg.Photo.FileID, "photo"
 	} else if msg.Sticker != nil {
-		return msg.Sticker.FileID
+		return msg.Sticker.FileID, "sticker"
 	} else {
-		return ""
+		return "", ""
 	}
 }
