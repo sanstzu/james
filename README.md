@@ -20,6 +20,10 @@ Once it is done installing the dependencies, you can build the bot by running:
 ```bash
 ./james
 ```
+
+## TODO:
+- Concurrency (especially on image processing)
+  
 ## Changelogs and Commands
 Can be found [here](https://sanstzu.vercel.app/blogs/james-telegram-bot).
 
